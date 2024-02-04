@@ -25,7 +25,7 @@ var (
 		[]string{"channelType", "channelID", "frequency", "modulation"}, nil,
 	)
 	uncorrectableErrorsDesc = prometheus.NewDesc(
-		"docsis_channel_uncorretable_errors_total",
+		"docsis_channel_uncorrectable_errors_total",
 		"number of uncorrectable errors on channel",
 		[]string{"chanelType", "channelID", "frequency", "modulation"}, nil,
 	)

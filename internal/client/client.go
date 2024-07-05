@@ -134,6 +134,28 @@ func (c *Client) CheckLogin() (bool, error) {
 	return data.SID == c.sid, nil
 }
 
+func (c *Client) Resync() error {
+	dataUrl := fmt.Sprintf("http://%s/data.lua", c.host)
+	values := url.Values{
+		"xhr":           {"1"},
+		"sid":           {c.sid},
+		"docsis_resync": {""},
+		"oldpage":       {"/support.lua"},
+		"page":          {"support"},
+	}
+	res, err := c.client.PostForm(dataUrl, values)
+	if err != nil {
+		return err
+	}
+
+	// questionable. FB seems to always report 200
+	if res.StatusCode != http.StatusOK {
+		return errors.New("resync failed")
+	}
+
+	return nil
+}
+
 // createResponse computes the PBKDF2-based response to the login challenge by the router
 func createResponse(challenge, password string) (string, error) {
 	if challenge[0:2] != "2$" {

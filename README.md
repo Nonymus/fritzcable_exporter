@@ -32,3 +32,43 @@ bit.
             username for login (if any)
 
 Wire up to your existing Prometheus installation you no doubt have
+
+# Trigger resync
+`/webhook` endpoint accepts Alertmanger formatted messages and trigger a resync of the cable
+modem if any of the alerts in the list is in state `firing`.
+
+## Alert example
+
+This makes use of a blackbox_exporter installation to determine if Internet connection is working
+
+Example rule:
+```yaml
+- name: fritzbox
+  rules:
+    - alert: FritzBorked
+      expr: sum(probe_success{job="probe-icmp",instance!="192.168.0.1"}) == 0 AND (sum(docsis_ready_state{state="ready"}) == 1)
+      for: 30s
+      labels:
+        severity: critical
+      annotations:
+        summary: FritzBox thinks it's connected, but it isn't
+```
+
+Matching Alertmanager config snippets:
+```yaml
+route:
+  ...
+  routes:
+    - matchers:
+        - alertname="FrtizBorked"
+      receiver: 'fritzcable'
+      group_wait: 0s
+      group_interval: 0s
+      repeat_interval: 180s
+...
+receivers:
+  ...
+  - name: 'fritzcable'
+    webhook_configs:
+      - url: http://localhost:9004/webhook
+```

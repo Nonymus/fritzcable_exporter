@@ -13,10 +13,11 @@ import (
 
 	"fritzcable_exporter/internal/adapter"
 	"fritzcable_exporter/internal/client"
+	"fritzcable_exporter/internal/webhook"
 )
 
 var (
-	flagHost         = flag.String("host", "fritz.box", "hostname of IP address of target device")
+	flagHost         = flag.String("host", "fritz.box", "IP address or hostname of target device")
 	flagUsername     = flag.String("username", "", "username for login (if any)")
 	flagPassword     = flag.String("password", "", "password for device login")
 	flagPasswordFile = flag.String("passwordFile", "", "path to file containing the password")
@@ -34,7 +35,7 @@ func main() {
 		if err != nil {
 			log.Fatal("failed to read password from file: ", err)
 		}
-		password = strings.TrimRight(string(pwBytes), "\n")
+		password = strings.TrimRight(string(pwBytes), "\r\n")
 	}
 
 	c := client.NewClient(*flagHost, *flagUsername, password)
@@ -53,6 +54,12 @@ func main() {
 	bc := adapter.BoxCollector{Client: c}
 	reg.MustRegister(bc)
 	http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+	http.HandleFunc("POST /resync", func(w http.ResponseWriter, r *http.Request) {
+		if err := c.Resync(); err != nil {
+			log.Println(err)
+		}
+	})
+	http.HandleFunc("POST /webhook", webhook.Handler(c))
 	log.Printf("starting server on %s/metrics", *flagListen)
 	log.Fatal(http.ListenAndServe(*flagListen, nil))
 }

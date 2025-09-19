@@ -1,0 +1,39 @@
+name: Build
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [ "linux", "darwin", "windows" ]
+        goarch: [ "amd64", "arm64" ]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.24'
+      - run: go build -o fritzcable_exporter_${{ matrix.goos }}_${{ matrix.goarch }} ./cmd
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+      - run: mv fritzcable_exporter_${{ matrix.goos }}_${{ matrix.goarch }} fritzcable_exporter_${{ matrix.goos }}_${{ matrix.goarch }}.exe
+        if: matrix.goos == 'windows'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: |
+            fritzcable_exporter_*
+  hash:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v5
+      - run: shasum -a 256 fritzcable_exporter_* > sha256sum.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shasum
+          path: sha256sum.txt

@@ -60,7 +60,7 @@ route:
   ...
   routes:
     - matchers:
-        - alertname="FrtizBorked"
+        - alertname="FritzBorked"
       receiver: 'fritzcable'
       group_wait: 0s
       group_interval: 0s

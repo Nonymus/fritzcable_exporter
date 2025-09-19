@@ -38,6 +38,8 @@ jobs:
     needs: build
     steps:
       - uses: actions/download-artifact@v5
+        with:
+          merge-multiple: 'true'
       - run: ls -R
       - run: shasum -a 256 fritzcable_exporter_* > sha256sum.txt
       - uses: actions/upload-artifact@v4

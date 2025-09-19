@@ -1,6 +1,7 @@
 name: Build
 on:
   push:
+    tags: [ "v*.*.*" ]
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
@@ -33,16 +34,18 @@ jobs:
           name: ${{ steps.compile.outputs.filename }}
           path: |
             fritzcable_exporter_*
-  hash:
+  release:
     runs-on: ubuntu-latest
     needs: build
+    if: github.ref_type == 'tag'
     steps:
       - uses: actions/download-artifact@v5
         with:
           merge-multiple: 'true'
-      - run: ls -R
       - run: shasum -a 256 fritzcable_exporter_* > sha256sum.txt
-      - uses: actions/upload-artifact@v4
+      - uses: softprops/action-gh-release@v2
         with:
-          name: shasum
-          path: sha256sum.txt
+          generate_release_notes: true
+          files: |
+            fritzcable_exporter_*
+            sha256sum.txt

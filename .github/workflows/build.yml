@@ -16,7 +16,7 @@ jobs:
       GOARCH: ${{ matrix.goarch }}
     steps:
       - run: |
-          echo "filename=fritzcable_exporter_$GOOS_$GOARCH" >> "$GITHUB_ENV"
+          echo "filename=fritzcable_exporter_${GOOS}_${GOARCH}" >> "$GITHUB_ENV"
       - run: |
           echo "filename=${filename}.exe" >> "$GITHUB_ENV"
         if: matrix.goos == 'windows'
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: '1.24'
-      - run: go build -o gs$filename ./cmd
+      - run: go build -o $filename ./cmd
       - uses: actions/upload-artifact@v4
         with:
           name: $filename

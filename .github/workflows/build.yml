@@ -24,7 +24,6 @@ jobs:
         if: matrix.goos == 'windows'
       - uses: actions/upload-artifact@v4
         with:
-          name: artifact-${{ matrix.goos }}-${{ matrix.goarch }}
           path: |
             fritzcable_exporter_*
   hash:
@@ -32,6 +31,7 @@ jobs:
     needs: build
     steps:
       - uses: actions/download-artifact@v5
+      - run: ls -R
       - run: shasum -a 256 fritzcable_exporter_* > sha256sum.txt
       - uses: actions/upload-artifact@v4
         with:

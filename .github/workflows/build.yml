@@ -11,19 +11,23 @@ jobs:
       matrix:
         goos: [ "linux", "darwin", "windows" ]
         goarch: [ "amd64", "arm64" ]
+    env:
+      GOOS: ${{ matrix.goos }}
+      GOARCH: ${{ matrix.goarch }}
     steps:
+      - run: |
+          echo "filename=fritzcable_exporter_$GOOS_$GOARCH" >> "$GITHUB_ENV"
+      - run: |
+          echo "filename=${filename}.exe" >> "$GITHUB_ENV"
+        if: matrix.goos == 'windows'
       - uses: actions/checkout@v5
       - uses: actions/setup-go@v6
         with:
           go-version: '1.24'
-      - run: go build -o fritzcable_exporter_${{ matrix.goos }}_${{ matrix.goarch }} ./cmd
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-      - run: mv fritzcable_exporter_${{ matrix.goos }}_${{ matrix.goarch }} fritzcable_exporter_${{ matrix.goos }}_${{ matrix.goarch }}.exe
-        if: matrix.goos == 'windows'
+      - run: go build -o gs$filename ./cmd
       - uses: actions/upload-artifact@v4
         with:
+          name: $filename
           path: |
             fritzcable_exporter_*
   hash:

@@ -30,7 +30,7 @@ jobs:
           go build -o $filename ./cmd
           echo "filename=$filename" >> "$GITHUB_OUTPUT"
         id: compile
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.compile.outputs.filename }}
           path: |

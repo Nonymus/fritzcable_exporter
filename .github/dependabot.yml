@@ -9,7 +9,7 @@ updates:
   - package-ecosystem: "github-actions"
     groups:
       name: github-actions
-      patterns: *
+      patterns: [ "*" ]
     directory: "/"
     commit-message:
       prefix: "chore(deps): "

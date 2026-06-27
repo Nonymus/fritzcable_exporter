@@ -3,6 +3,8 @@ run-name: Build ${{ github.ref_name }}
 
 on:
   pull_request:
+    paths-ignore:
+      - '.github/**/*'
 
 permissions:
   contents: read

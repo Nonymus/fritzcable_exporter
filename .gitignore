@@ -1,2 +1,4 @@
 .idea/
 pwFile
+# Added by goreleaser init:
+dist/

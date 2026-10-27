@@ -1,6 +1,9 @@
 name: Release
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch: 
 
 permissions:
   contents: write
@@ -18,6 +21,8 @@ jobs:
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@d9bf53a078bd2f86aaffaec796dbb3d28f1b6f34 #v8.1.3
         id: release
+        with:
+          skip_npm_plugin: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: |
@@ -27,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Create Release
     needs: [ tag ]
+    if: ${{ needs.tag.outputs.release_created }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
